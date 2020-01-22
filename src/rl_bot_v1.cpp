@@ -59,15 +59,23 @@ extern const uint32_t array_depth=3;
 dlib::rand rnd(time(NULL));
 
 // ----------------------------------------------------------------------------------------
-
+/*
 using car_net_type = dlib::loss_mean_squared_multioutput<dlib::htan<dlib::fc<2,
     dlib::multiply<dlib::fc<5,
     dlib::multiply<dlib::fc<20,
     dlib::multiply<dlib::fc<80,
     dlib::input<dlib::matrix<float>>
     >> >> >> >>>;
+car_net_type c_net(dlib::multiply_(0.0001), dlib::multiply_(0.5), dlib::multiply_(0.5));
+*/
 
-car_net_type c_net(dlib::multiply_(0.0005), dlib::multiply_(0.5), dlib::multiply_(0.5));
+using car_net_type = dlib::loss_mean_squared_multioutput<dlib::htan<dlib::fc<2,
+    dlib::multiply<dlib::fc<20,
+    dlib::multiply<dlib::fc<120,
+    dlib::input<dlib::matrix<float>>
+    >> >> >>>;
+car_net_type c_net(dlib::multiply_(0.0001), dlib::multiply_(0.5));
+
 dlib::image_window win;
 dlib::matrix<dlib::rgb_pixel> color_map;
 
@@ -99,7 +107,8 @@ public:
 	float max_range = 80.0;
     //std::vector<double> detection_angles = { -135, -90, -45, 0, 45, 90, 135 };
     //std::vector<double> detection_angles = {-135, -125, -115, -105, -95, -85, -75, -65, -55, -45, -35, -25, -15, -5, 5, 15, 25, 35, 45, 55, 65, 75, 85, 95, 105, 115, 125, 135};
-    std::vector<double> detection_angles = { -90.0, -45.0, -22.5, -11.0, -0.5, 0.5, 11.0, 22.5, 45.0, 90.0 };
+    //std::vector<double> detection_angles = { -90.0, -45.0, -22.5, -11.0, -0.5, 0.5, 11.0, 22.5, 45.0, 90.0 };
+    std::vector<double> detection_angles = { -60.0, -45.0, -22.5, -11.0, -0.5, 0.5, 11.0, 22.5, 45.0, 60.0 };
 
     //std::vector<double> detection_angles;
 
@@ -390,14 +399,14 @@ double eval_net(particle p)
 
     for (idx = 0; idx < l4_size; ++idx)
         *(l4_data + idx) = (float)x3(0, idx);
-
+/*
     long l5_size = dlib::layer<8>(c_net).layer_details().get_layer_params().size();
     auto l5_data = dlib::layer<8>(c_net).layer_details().get_layer_params().host();
     dlib::matrix<double> x4 = p.get_x4();
 
     for (idx = 0; idx < l5_size; ++idx)
         *(l5_data + idx) = (float)x4(0, idx);
-
+*/
     uint64_t movement_count = 0;
     
     while (crash == false)
@@ -417,15 +426,7 @@ double eval_net(particle p)
 
         vh1.move(m2(0, 0), m2(1, 0));
 
-
-
-        //vh1.move(2 * 1, 0);
-        //vh1.move(2 * 1, -0.5);
-
-        //vh1.move(2 * -1, 0.5);
-        //vh1.move(2 * -1, -0.5);
-
-        std::string title = "Particle Number: " + num2str(p.get_number(), "%03d") + ", B: " + num2str(vh1.heading*180.0/dlib::pi, "%2.4f") + ", L/R: " + num2str(m2(0, 0), "%2.4f/") + num2str(m2(1, 0), "%2.4f") + ", Points: " + num2str(-vh1.points, "%4.0f");
+        std::string title = "I: " + num2str(p.iteration, "%04d") + ", N: " + num2str(p.get_number(), "%03d") + ", B: " + num2str(vh1.heading*180.0/dlib::pi, "%2.4f") + ", L/R: " + num2str(m2(0, 0), "%2.4f/") + num2str(m2(1, 0), "%2.4f") + ", Points: " + num2str(-vh1.points, "%4.0f");
         win.set_title(title);
 
         if(current_points == vh1.points)
@@ -440,7 +441,7 @@ double eval_net(particle p)
 
         crash = vh1.test_for_crash(map);
 
-        if (movement_count > 1000)
+        if (movement_count > 600)
         {
             std::cout << "Count" << std::endl;
             crash = true;
@@ -466,33 +467,8 @@ int main(int argc, char** argv)
     typedef std::chrono::duration<double> d_sec;
     auto start_time = chrono::system_clock::now();
     auto stop_time = chrono::system_clock::now();
-    unsigned long training_duration = 1;  // number of hours to train 
     auto elapsed_time = chrono::duration_cast<d_sec>(stop_time - start_time);
 
-/*
-    std::vector<double> stop_criteria;
-    uint64_t num_crops = 0;
-    //std::vector<std::pair<uint64_t, uint64_t>> crop_sizes = { {1,1}, {38,148} };
-    //std::vector<uint32_t> filter_num;
-    //uint64_t max_one_step_count;
-    std::vector<dlib::matrix<unsigned char>> training_images;
-    std::vector<dlib::matrix<unsigned char>> testing_images;
-    std::vector<unsigned long> training_labels;
-    std::vector<unsigned long> testing_labels;
-
-    std::vector<std::vector<std::string>> training_file;
-    std::vector<std::vector<std::string>> test_file;
-
-    std::string data_directory;
-    std::string train_inputfile, test_inputfile;
-    std::vector<std::pair<std::string, std::string>> tr_image_files, te_image_files;
-    std::vector<dlib::matrix<uint16_t>> gt_train, gt_test;
-
-    dlib::matrix<uint16_t> g_crop;
-    dlib::rectangle rect_im, rect_gt;
-
-    //std::array<dlib::matrix<uint16_t>, img_depth> tr_crop;
-*/
     std::ofstream DataLogStream;
     std::string platform;
 
@@ -530,12 +506,6 @@ int main(int argc, char** argv)
 
         std::cout << trainer << std::endl;
 
-        auto &t1a = dlib::layer<2>(c_net).layer_details().get_weights();
-        auto &t1a1 = dlib::layer<2>(c_net);
-
-        dlib::layer<2>(c_net).layer_details().setup(t1a1.subnet());
-        auto &t1b = dlib::layer<2>(c_net).layer_details().get_weights();
-
         for (idx = 0; idx < 10; ++idx)
         {
             trainer.train_one_step({ input }, { motion });
@@ -546,13 +516,13 @@ int main(int argc, char** argv)
         // ----------------------------------------------------------------------------------------
         dlib::load_image(color_map, "../maps/test_map_v2_2.png");
 
-        dlib::pso_options options(100, 5000, 2.4, 2.1, 1.0, 1, 1.0);
+        dlib::pso_options options(100, 3000, 2.4, 2.1, 1.0, 1, 1.0);
 
         std::cout << "----------------------------------------------------------------------------------------" << std::endl;
         std::cout << options << std::endl;
 
         dlib::pso<particle> p(options);
-        //p.set_syncfile("test.dat");
+        p.set_syncfile("../nets/rl_bot_pso_v1.dat");
 
         //dlib::matrix<double, 1, 2> x1,x2, v1,v2;
         dlib::matrix<double, 1, fc1_size> x1,v1;

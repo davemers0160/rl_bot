@@ -55,6 +55,8 @@ public:
 
     uint64_t get_number(void) { return number; }
 
+    void set_iteration(uint64_t v) { iteration = v; }
+
     // ----------------------------------------------------------------------------------------
     // This function is used to randomly initialize 
     void rand_init(dlib::rand& rnd, std::pair<particle, particle> limits)

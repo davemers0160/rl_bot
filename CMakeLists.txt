@@ -45,33 +45,31 @@ message("Platform: " ${PLATFORM})
 if(${PLATFORM} STREQUAL "Laptop")
     set(COMMON_ROOT "D:/Common")
     set(DLIB_CONTRIB "D:/Projects/dlib-contrib")
-    set(DFD_COMMON_ROOT "D:/Projects/dfd_common")
     include(D:/dlib-19.17/dlib/cmake)
 elseif(${PLATFORM} STREQUAL "MainGear")
     set(_ECLIPSE_VERSION "3.8")
     set(COMMON_ROOT "~/Common")
     set(DLIB_CONTRIB "~/Projects/dlib-contrib")
-    set(DFD_COMMON_ROOT "~/Projects/dfd_common")
     include(~/dlib-19.17/dlib/cmake)
 elseif(${PLATFORM} STREQUAL "HPC")
     set(COMMON_ROOT "$HOME/Common")
     set(DLIB_CONTRIB "~/Projects/dlib-contrib")
-    set(DFD_COMMON_ROOT "$HOME/Projects/dfd_common")
     include(~/dlib/dlib/cmake)
 elseif(${PLATFORM} STREQUAL "SL02319")
     set(COMMON_ROOT "/mnt/data/Common")
     set(DLIB_CONTRIB "/mnt/data/dlib-contrib")
-    set(DFD_COMMON_ROOT "/mnt/data/Projects/dfd_common")
     include(/mnt/data/dlib-19.17/dlib/cmake)
 elseif(${PLATFORM} STREQUAL "LaptopN")
     set(COMMON_ROOT "C:/Projects/Common")
     set(DLIB_CONTRIB "C:/Projects/dlib-contrib")
-    set(DFD_COMMON_ROOT "C:/Projects/dfd_common")
     include(C:/dlib-19.17/dlib/cmake)	
+elseif(${PLATFORM} STREQUAL "BEAST")
+    set(COMMON_ROOT "E:/Projects/Common")
+    set(DLIB_CONTRIB "E:/Projects/dlib-contrib")
+    include(E:/dlib-19.21/dlib/cmake)	
 else()
     set(COMMON_ROOT "D:/Common")
     set(DLIB_CONTRIB "D:/Projects/dlib-contrib")
-    set(DFD_COMMON_ROOT "D:/Projects/dfd_common")
     include(D:/dlib/dlib/cmake)
 endif()
 
@@ -84,17 +82,12 @@ file(GLOB SOURCES "src/*.c*"
     "${DLIB_CONTRIB}/src/*.cpp"
     )
 
-set(project_includes "include" "${COMMON_ROOT}/include" "${DLIB_CONTRIB}/include" "${DFD_COMMON_ROOT}/include")
-
-message(" ")
-message("--------------------------------------------------------")
-message("Source Files: ")
-foreach(S ${SOURCES})
-    message("  " ${S})
-endforeach()
-message("--------------------------------------------------------")
-message(" ")
-
+set(project_includes 
+    "include" 
+    "${COMMON_ROOT}/include" 
+    "${DLIB_CONTRIB}/include"
+    )
+    
 # find OpenCV
 find_package(OpenCV REQUIRED)
 if (OpenCV_FOUND)
@@ -104,11 +97,22 @@ else()
 	message("OpenCV not found, so we won't build the project.")
 endif()
 
+
 #add_definitions(-DMATPLOTLIBCPP_PYTHON_HEADER=Python.h)
 #set(project_includes ${project_includes} D:/Python_3.6.5/include)
 #set(project_includes ${project_includes} D:/Python_3.6.5/Lib/site-packages/numpy/core/include)
 
+
 message(" ")
+message("--------------------------------------------------------")
+message("Source Files: ")
+foreach(S ${SOURCES})
+    message("  " ${S})
+endforeach()
+message("--------------------------------------------------------")
+
+message(" ")
+
 message("--------------------------------------------------------")
 message("Project Includes: ")
 foreach(S ${project_includes})

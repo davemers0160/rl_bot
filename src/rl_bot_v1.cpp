@@ -559,6 +559,8 @@ int main(int argc, char** argv)
         std::pair<particle, particle> v_lim(particle(-v1,-v2,-v3,-v4), particle(v1,v2,v3,v4));
 
         p.init(x_lim, v_lim);
+
+        std::cout << c_net << std::endl;
         
         start_time = chrono::system_clock::now();
 
